@@ -42,24 +42,21 @@ ln -s "/path/to/Premiere Pro 26.0 C++ SDK/Examples" \
 ./scripts/build-arm64-package.sh
 ```
 
-To create an unsigned package after the build:
-
-```sh
-(cd build-arm64 && COPYFILE_DISABLE=1 cpack -D CPACK_PRODUCTBUILD_IDENTITY_NAME=)
-```
+The unsigned package is written to
+`build-arm64/HapAdobePlugin-<version>-macOS-arm64.pkg`.
 
 ## Signing and Notarization
 
 ```sh
 ./scripts/sign-package.sh \
-  build-arm64/HapEncoder-1.2.0-rc2-macOS.pkg \
-  dist/HapEncoder-1.2.0-rc2-macOS-arm64.pkg \
   "Developer ID Installer: YOUR NAME (TEAMID)"
 
 ./scripts/notarize-package.sh \
-  dist/HapEncoder-1.2.0-rc2-macOS-arm64.pkg \
   your-notarytool-keychain-profile
 ```
+
+The signed and notarized release package uses the same versioned name:
+`dist/HapAdobePlugin-<version>-macOS-arm64.pkg`.
 
 ## Initialize a Git Repo
 

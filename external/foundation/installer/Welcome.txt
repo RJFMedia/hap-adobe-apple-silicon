@@ -1,1 +1,2 @@
-You will be guided through the steps necessary to install this software.
+This installer will add Hap import/playback and export support for Adobe
+Creative Cloud applications on Apple Silicon Macs.
