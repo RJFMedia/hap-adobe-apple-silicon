@@ -27,6 +27,8 @@ for Adobe Creative Cloud.
 - The included Adobe SDK header subsets are enough for this plugin build.
 - FFmpeg is vendored as prebuilt static libraries under
   `external/foundation/external/ffmpeg/FFmpeg`.
+- FFmpeg is statically linked; see `docs/release/ffmpeg-lgpl-compliance.md`
+  before publishing binary installers.
 
 ## Release Validation
 

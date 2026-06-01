@@ -34,7 +34,10 @@ original authors, maintainers, companies, or contributors.
   - Copyright (C) 2007, Id Software, Inc.; written by J.M.P. van Waveren.
   - Copyright (C) 2009-2011, Electronic Arts Inc.
 - FFmpeg
-  - Portions of FFmpeg are used under LGPL terms.
+  - FFmpeg 4.0.2 / `n4.0.2-3-g9cc5337247` is used under LGPL v2.1-or-later
+    terms.
+  - Source and license files are included under
+    `external/foundation/external/ffmpeg/FFmpeg`.
 
 ## License Text
 

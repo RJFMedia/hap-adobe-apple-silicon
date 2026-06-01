@@ -12,3 +12,7 @@ Principal contributors to this plugin are
 -  Nick Zinovenko
 
 Thanks to Tom Butterworth for creating the Hap codec and Vidvox for supporting that development.
+
+This software uses libraries from the FFmpeg project under LGPL v2.1-or-later
+terms. FFmpeg source and license files are included in the public source tree
+under external/foundation/external/ffmpeg/FFmpeg.
