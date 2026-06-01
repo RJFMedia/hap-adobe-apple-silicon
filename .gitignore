@@ -1,0 +1,75 @@
+.DS_Store
+.DS_store
+.AppleDouble
+.LSOverride
+
+.vscode/
+.idea/
+
+# Local build products
+build/
+build-*/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+Testing/
+_CPack_Packages/
+install_manifest*.txt
+*.o
+*.d
+*.obj
+*.pch
+
+# Generated FFmpeg build metadata. The vendored static libraries are tracked,
+# but intermediate object/dependency files and configure output are local.
+/external/foundation/external/ffmpeg/FFmpeg/ffbuild/
+
+# Generated plugin/install artifacts
+*.pkg
+*.dmg
+*.zip
+*.aex
+*.prm
+*.bundle
+*.rsrc
+*.nib
+
+# Native build outputs
+/Release/
+/Debug/
+/RelWithDebInfo/
+/MinSizeRel/
+/Xcode/
+
+# Local signing/notarization material
+*.cer
+*.certSigningRequest
+*.p12
+*.p8
+*.pem
+*.key
+*.csr
+*.mobileprovision
+*.provisionprofile
+*.notarytool-profile
+
+# Local credentials/config
+.env
+.env.*
+*.local
+*.local.*
+publish.local.yml
+notary*.json
+credentials*.json
+secrets*.json
+api-key*
+apple-id*
+
+# Local Adobe SDK payloads. These are required to build, but should not be
+# published unless you have redistribution rights from Adobe.
+/external/foundation/external/adobe/AfterEffectsSDK/
+/external/foundation/external/adobe/premiere/
+
+# Local logs and scratch output
+logs/
+dist/

@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+
+PRESETS_SRC="${Foundation_PRESETS_INSTALL_SRC}"
+PRESETS_PREFIX="$HOME/Documents/Adobe/Adobe Media Encoder"
+
+for VERSION_DIR in "$PRESETS_PREFIX"/*; do
+    [ -d "$VERSION_DIR" ] || continue
+    VERSION="$(basename "$VERSION_DIR")"
+    case "$VERSION" in
+        [0-9]*.[0-9]*)
+            ;;
+        *)
+            continue
+            ;;
+    esac
+    if [ -d "$PRESETS_PREFIX/$VERSION" ]; then
+        if [ ! -d "$PRESETS_PREFIX/$VERSION/Presets" ]; then
+            mkdir "$PRESETS_PREFIX/$VERSION/Presets"
+            chown "$USER" "$PRESETS_PREFIX/$VERSION/Presets"
+        fi
+        cp -R "$PRESETS_SRC" "$PRESETS_PREFIX/$VERSION/Presets/"
+    fi
+done
+
+exit 0
