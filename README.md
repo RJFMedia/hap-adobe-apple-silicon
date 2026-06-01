@@ -1,114 +1,110 @@
-![logo](asset/hap-icon.png)
+![Hap logo](asset/hap-icon.png)
 
-# Hap Exporter for Adobe CC
+# Hap Adobe Plugin for Apple Silicon
 
-This is the community-supplied Hap and Hap Q exporter plugin for Adobe CC 2019 and Adobe CC 2020.
+This repository maintains a macOS Apple Silicon build of the Hap plugin for
+Adobe Creative Cloud.
 
-HAP is a collection of high-performance codecs optimised for playback of multiple layers of video.
+It provides:
 
-Exporter plugins are provided for
-- Adobe Media Encoder
-- Adobe Premiere
-- Adobe After Effects
+- Hap export through Adobe Media Encoder and Premiere Pro.
+- Hap import and playback in Premiere Pro and After Effects.
+- Native `arm64` plugin bundles for current Apple Silicon Macs.
 
-Please see [license.txt](license.txt) for the licenses of this plugin and the components used to create it.
+The original public Hap exporter was Intel-only on macOS. This fork keeps the
+export workflow working on Apple Silicon and adds a CPU decoder path so Hap
+movies can be imported and previewed in current Adobe applications.
 
-## Getting it
+## Download
 
-An installer for the exporter can be downloaded [here](https://github.com/disguise-one/hap-encoder-adobe-cc/releases).
+Download the notarized macOS installer from the GitHub releases page:
 
-## Requirements
+https://github.com/RJFMedia/hap-adobe-apple-silicon/releases/latest
 
-This codec has been tested on Windows 10 and macOS Catalina.
+Current package:
 
-It has been tested in Adobe CC 2019 and Adobe CC 2020.
+`HapAdobePlugin-2.0.0-macOS-arm64.pkg`
 
-## Installation
+## Supported Platform
 
-Run the provided installer.
+- macOS on Apple Silicon (`arm64`)
+- Adobe Media Encoder, Premiere Pro, and After Effects
+
+Windows is intentionally out of scope for this fork because the existing Intel
+Windows plugin still works.
 
 ## Usage
 
-### Adobe Media Encoder and Adobe Premiere
+After installation, Hap export is available from Adobe Media Encoder and
+Premiere Pro as the `HAP Video` format.
 
-After installation, the encoders will be available as the 'HAP Video' format when exporting in Adobe Media Encoder or Adobe Premiere
+Supported Hap variants:
 
-![HAP format](doc/user_guide/format-option.png)
+| Codec | Alpha | Notes |
+| --- | --- | --- |
+| Hap | No | Lowest data rate, reasonable image quality |
+| Hap Alpha | Yes | Hap with alpha |
+| Hap Q | No | Higher image quality, larger files |
+| Hap Q Alpha | Yes | Hap Q with alpha |
+| Hap Alpha-Only | Yes | Alpha-only Hap stream |
 
-After choosing the format, codec options may be chosen.
+Hap movie import and playback are available in Premiere Pro and After Effects.
 
-![HAP codec options](doc/user_guide/codec-options.png)
+## Building
 
-Default presets are supplied and are available in Adobe Media Encoder.
+The public repository does not include Adobe SDK payloads. To build locally,
+provide your own Adobe SDK copies at:
 
-![HAP presets](doc/user_guide/media-encoder-presets.png)
+```sh
+external/foundation/external/adobe/AfterEffectsSDK
+external/foundation/external/adobe/premiere
+```
 
-Movies that are encoded with the plugin are exported into .mov files.
+Then build the unsigned package:
 
-### Adobe After Effects
+```sh
+./scripts/build-arm64-package.sh
+```
 
-The HAP codecs may be selected by choosing 'Quicktime HAP Format' on an output module.
+The unsigned package is written to:
 
-### Choosing the right codec for the job: Hap, Hap Alpha, Hap Q and Hap Q Alpha
+```text
+build-arm64/HapAdobePlugin-<version>-macOS-arm64.pkg
+```
 
-There are four different flavors of HAP to choose from when encoding your clips.
+For signing and notarization:
 
- codec       | properties
- ----------- | --------------------------------------------------------------------------------
- Hap         | lowest data-rate and reasonable image quality                                    
- Hap Alpha   | same image quality as Hap, and supports an Alpha channel                         
- Hap Q       | improved image quality, at the expense of larger file sizes                      
- Hap Q Alpha | improved image quality and an Alpha channel, at the expense of larger file sizes 
+```sh
+./scripts/sign-package.sh "Developer ID Installer: YOUR NAME (TEAMID)"
+./scripts/notarize-package.sh your-notarytool-keychain-profile
+```
 
-### Codec parameters
-For Hap and Hap Alpha codecs render time can be reduced with Quality-Fast option. It uses fast and simple algorithm, but with reduced image quality.
+More detailed build notes are in [README-APPLE-SILICON.md](README-APPLE-SILICON.md).
 
-- Fast suggested for draft renders, last-minute notebook renders, etc...
-- Normal is default option for general renders
+## Project Notes
 
-![Hap quality option](doc/user_guide/codec-quality.png)
-
-An optional specified number of chunks size may be specified to optimize for ultra high resolution video on a particular hardware system. This setting should typically only be used if you are reaching a CPU performance bottleneck during playback. As a general guide, for HD footage or smaller you can set the chunk size to 1 and for 4k or larger footage the number of chunks should never exceed the number of CPU cores on the computer used for playback.
-
-![HAP chunk counts](doc/user_guide/chunk-counts.png)
-
-At present, 'auto' corresponds to choosing 1 chunk per texture; this may change in the future.
-
-
-## What is HAP
-
-HAP is a collection of high-performance codecs optimised for playback of multiple layers of video.
-
-HAP prioritises decode-speed, efficient upload to GPUs and GPU-side decoding to enable the highest amount of video content to be played back at once on modern hardware.
-
-Please see
-
-[http://hap.video/](http://hap.video/)
-
-for details.
-
-## Known issues
-
-Performing multiple parallel exports in Media Encoder may cause the system to become unresponsive, although the operation should eventually complete.
-
-The plugin does not work in After Effects CC 2018.
-
-## Development
-
-Please see the instructions for the Codec Foundation upon which these plugins are based:
-[https://github.com/codec-foundation/adobe-cc]
+- The plugin is macOS-only in this source tree.
+- The package installs Adobe plugin bundles into Adobe's shared MediaCore
+  plugin location.
+- FFmpeg is statically linked for MOV reading/writing. See
+  [docs/release/ffmpeg-lgpl-compliance.md](docs/release/ffmpeg-lgpl-compliance.md)
+  before publishing binary builds.
+- Release packages should include the corresponding FFmpeg source archive from
+  `scripts/make-ffmpeg-source-archive.sh`.
 
 ## Credits
 
-Principal contributors to this plugin are
+This project builds on:
 
--  Greg Bakker (gbakker@gmail.com)
--  Richard Sykes
--  [Tom Butterworth](http://kriss.cx/tom)
--  [Nick Zinovenko](https://github.com/exscriber)
+- [disguise-one/hap-encoder-adobe-cc](https://github.com/disguise-one/hap-encoder-adobe-cc)
+- [codec-foundation/adobe-cc](https://github.com/codec-foundation/adobe-cc)
+- [Vidvox/HapInAVFoundation](https://github.com/Vidvox/hap-in-avfoundation)
+- The Hap codec work by Tom Butterworth and Vidvox
 
-Development of this plugin was sponsored by [disguise](http://disguise.one), makers of the disguise show production software and hardware.
+See [NOTICE.md](NOTICE.md) for full attribution and third-party notices.
 
-The Hap codec was developed by Tom Butterworth with the support of [VIDVOX](https://vidvox.net).
+## License
 
-Many thanks to Tom Butterworth, David Lublin, Nick Wilkinson, Ruben Garcia and the disguise QA team for their assistance throughout development of this plugin.
+License terms and third-party notices are in [license.txt](license.txt),
+[NOTICE.md](NOTICE.md), and the dependency license files included in this
+repository.
