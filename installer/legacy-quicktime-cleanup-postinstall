@@ -1,0 +1,94 @@
+#!/bin/sh
+
+LOG_FILE="/Library/Logs/HapAdobePluginInstaller.log"
+DISABLED_ROOT="/Library/Application Support/HapAdobePlugin/Disabled Legacy QuickTime Components"
+TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+REMOVED_ANY=0
+
+log() {
+    /bin/mkdir -p "$(/usr/bin/dirname "$LOG_FILE")" 2>/dev/null || true
+    /bin/echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG_FILE" 2>/dev/null || true
+}
+
+plist_value() {
+    /usr/libexec/PlistBuddy -c "Print :$2" "$1" 2>/dev/null || true
+}
+
+is_intel_only_hap_component() {
+    COMPONENT_PATH="$1"
+    PLIST_PATH="$COMPONENT_PATH/Contents/Info.plist"
+
+    [ -d "$COMPONENT_PATH" ] || return 1
+    [ -f "$PLIST_PATH" ] || return 1
+
+    BUNDLE_ID="$(plist_value "$PLIST_PATH" CFBundleIdentifier)"
+    EXECUTABLE_NAME="$(plist_value "$PLIST_PATH" CFBundleExecutable)"
+    [ -n "$EXECUTABLE_NAME" ] || EXECUTABLE_NAME="Hap"
+    EXECUTABLE_PATH="$COMPONENT_PATH/Contents/MacOS/$EXECUTABLE_NAME"
+
+    if [ ! -f "$EXECUTABLE_PATH" ] && [ -f "$COMPONENT_PATH/Contents/MacOS/Hap" ]; then
+        EXECUTABLE_PATH="$COMPONENT_PATH/Contents/MacOS/Hap"
+    fi
+
+    [ -f "$EXECUTABLE_PATH" ] || return 1
+
+    case "$COMPONENT_PATH:$BUNDLE_ID" in
+        */Hap.component:*|*:com.vidvox.Hap-Codec)
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+
+    ARCHS="$(/usr/bin/lipo -archs "$EXECUTABLE_PATH" 2>/dev/null || true)"
+    case " $ARCHS " in
+        *" arm64 "*)
+            return 1
+            ;;
+    esac
+
+    case " $ARCHS " in
+        *" i386 "*|*" x86_64 "*)
+            return 0
+            ;;
+    esac
+
+    FILE_INFO="$(/usr/bin/file "$EXECUTABLE_PATH" 2>/dev/null || true)"
+    /usr/bin/printf '%s\n' "$FILE_INFO" | /usr/bin/grep -Eq 'i386|x86_64'
+}
+
+disable_component() {
+    COMPONENT_PATH="$1"
+
+    if ! is_intel_only_hap_component "$COMPONENT_PATH"; then
+        log "Skipping $COMPONENT_PATH; it is not an Intel-only legacy Hap QuickTime component."
+        return
+    fi
+
+    DEST_DIR="$DISABLED_ROOT/$TIMESTAMP"
+    SAFE_NAME="$(/usr/bin/printf '%s' "$COMPONENT_PATH" | /usr/bin/sed 's#^/##; s#[/:]#_#g')"
+    DEST_PATH="$DEST_DIR/$SAFE_NAME"
+
+    if /bin/mkdir -p "$DEST_DIR" && /bin/mv "$COMPONENT_PATH" "$DEST_PATH"; then
+        log "Moved Intel-only legacy Hap QuickTime component from $COMPONENT_PATH to $DEST_PATH."
+        REMOVED_ANY=1
+    else
+        log "Failed to move Intel-only legacy Hap QuickTime component at $COMPONENT_PATH."
+    fi
+}
+
+log "Starting optional legacy QuickTime Hap.component cleanup."
+
+for COMPONENT in "/Library/QuickTime/Hap.component" /Users/*/Library/QuickTime/Hap.component; do
+    [ -d "$COMPONENT" ] || continue
+    disable_component "$COMPONENT"
+done
+
+if [ "$REMOVED_ANY" -eq 1 ]; then
+    /usr/sbin/pkgutil --forget com.Vidvox.pkg.Hap >/dev/null 2>&1 || true
+    log "Forgot legacy package receipt com.Vidvox.pkg.Hap if it was present."
+fi
+
+log "Finished optional legacy QuickTime Hap.component cleanup."
+
+exit 0

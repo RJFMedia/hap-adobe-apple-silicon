@@ -1,0 +1,6 @@
+This marker belongs to the optional installer component that disables legacy
+Intel-only QuickTime Hap.component installations.
+
+The cleanup is intentionally conservative: it only moves Intel-only
+Hap.component bundles out of QuickTime component folders. It does not remove
+the Apple Silicon Adobe MediaCore plug-ins installed by this package.

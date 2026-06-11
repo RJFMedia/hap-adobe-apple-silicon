@@ -33,6 +33,9 @@ set(Foundation_PRESETS
 )
 set(Foundation_FILE_IMPORT_FOUR_CC 0x48415000L)    # hex for HAP\0, needed as unique importer id so After Effects picks it up as an importer
 set(Foundation_CODEC_NAME_WITH_HEX_SIZE_PREFIX "\"\\x07HAP\\0\\0\\0\\0\"")    # !!! hack - size must be 0x7 atm, and padded to 7-bytes- we're not using the recommended resource builder step that compiles the correct sizes around this
+if(APPLE)
+    set(Foundation_CUSTOM_INSTALLER_COMPONENTS LegacyQuickTimeCleanup)
+endif()
 
 # project-wide build settings
 # ----------------------------
@@ -87,3 +90,12 @@ add_subdirectory(external/foundation/installer)
 
 # codec-specific components
 # must be added *after* CPACK usage in external/foundation/installer above
+if(APPLE)
+    install(
+        FILES installer/LegacyQuickTimeCleanup.txt
+        DESTINATION "Library/Application Support/HapAdobePlugin"
+        COMPONENT LegacyQuickTimeCleanup
+    )
+
+    cpack_add_component(LegacyQuickTimeCleanup)
+endif()

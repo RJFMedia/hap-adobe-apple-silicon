@@ -23,7 +23,7 @@ https://github.com/RJFMedia/hap-adobe-apple-silicon/releases/latest
 
 Current package:
 
-`HapAdobePlugin-2.0.0-macOS-arm64.pkg`
+`HapAdobePlugin-2.0.1-macOS-arm64.pkg`
 
 ## Supported Platform
 
