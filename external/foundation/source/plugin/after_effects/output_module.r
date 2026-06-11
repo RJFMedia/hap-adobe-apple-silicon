@@ -29,10 +29,15 @@ resource 'PiPL' (16000) {
 	#else
 		CodeWin32X86 {"EntryPointFunc"},
 	#endif
-#else	
+#else
 	#ifdef AE_OS_MAC
-		CodeMacIntel32 {"EntryPointFunc"},
-		CodeMacIntel64 {"EntryPointFunc"},
+		#ifdef AE_PROC_ARM64
+			CodeMacARM64 {"EntryPointFunc"},
+		#elif defined(AE_PROC_INTELx64)
+			CodeMacIntel64 {"EntryPointFunc"},
+		#elif defined(AE_PROC_INTEL)
+			CodeMacIntel32 {"EntryPointFunc"},
+		#endif
 	#endif
 #endif
 	}
